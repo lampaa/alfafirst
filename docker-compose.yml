@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  postgis:
+    image: kartoza/postgis:11.0-2.5
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DBNAME=alfafirst
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASS=root
+      - POSTGRES_MULTIPLE_EXTENSIONS=postgis,postgis_topology
+
+  websocket:
+    image: arpmipg/alfa-battle:task1-websocket
+    ports:
+      - 8100:8100
+
+  alfafirst:
+    image: lampa/alfafirst:2.0
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgis
+
+    command: ["java", "-jar", "first-0.0.1.jar",
+              "--spring.datasource.url=jdbc:postgresql://postgis/alfafirst",
+              "--spring.datasource.username=postgres",
+              "--spring.datasource.password=root",
+              "--alfa.websocket.url=ws://websocket:8100",
+              "--alfa.keystore.sert=file:/var/www/apidevelopers.jks"]
